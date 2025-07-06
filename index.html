@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tebak Warna 🎯</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f5f7fa;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .color-box {
+      width: 150px;
+      height: 150px;
+      margin: 20px auto;
+      border: 5px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-choice {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #2196f3;
+      color: white;
+      min-width: 100px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-choice:hover {
+      background-color: #8cb3fa;
+    }
+
+    .btn-correct {
+      background-color: #25cf02 !important;
+    }
+
+    .btn-wrong {
+      background-color: #e70101 !important;
+    }
+
+    .stats {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #restart {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #2196f3;
+      color: white;
+      cursor: pointer;
+      display: none;
+    }
+
+    #restart:hover {
+      background: #1976d2;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 Tebak Warna</h1>
+  <p>Tebak warna dari kotak di bawah ini. Skor naik kalau benar!</p>
+
+  <div class="color-box" id="colorDisplay"></div>
+
+  <div class="choices">
+    <button class="btn-choice" onclick="checkAnswer(this)"></button>
+    <button class="btn-choice" onclick="checkAnswer(this)"></button>
+    <button class="btn-choice" onclick="checkAnswer(this)"></button>
+  </div>
+
+  <div class="stats">
+    🧠 Skor: <span id="score">0</span> | ❤️ Nyawa: <span id="lives">3</span>
+  </div>
+
+  <div id="result"></div>
+  <button id="restart" onclick="startGame()">🔁 Main Lagi</button>
+
+  <script>
+    let correctColor = "";
+    let score = 0;
+    let lives = 3;
+
+    function randomColor() {
+      const r = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+      const g = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+      const b = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+      return `#${r}${g}${b}`;
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      updateStats();
+      document.getElementById("restart").style.display = "none";
+      document.getElementById("result").textContent = "";
+      newRound();
+    }
+
+    function newRound() {
+      const colorBox = document.getElementById("colorDisplay");
+      const buttons = document.querySelectorAll(".btn-choice");
+      document.getElementById("result").textContent = "";
+
+      correctColor = randomColor();
+      colorBox.style.backgroundColor = correctColor;
+
+      const wrong1 = randomColor();
+      const wrong2 = randomColor();
+      const options = [correctColor, wrong1, wrong2].sort(() => Math.random() - 0.5);
+
+      buttons.forEach((btn, i) => {
+        btn.textContent = options[i];
+        btn.disabled = false;
+        btn.className = "btn-choice";
+      });
+    }
+
+    function checkAnswer(button) {
+      const result = document.getElementById("result");
+
+      if (button.textContent === correctColor) {
+        score++;
+        result.textContent = "✅ Benar!";
+        result.style.color = "green";
+      } else {
+        lives--;
+        result.textContent = `❌ Salah! Jawaban yang benar: ${correctColor}`;
+        result.style.color = "red";
+      }
+
+      updateStats();
+
+      document.querySelectorAll(".btn-choice").forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correctColor) {
+          btn.classList.add("btn-correct");
+        } else {
+          btn.classList.add("btn-wrong");
+        }
+      });
+
+      if (lives > 0) {
+        setTimeout(newRound, 1500);
+      } else {
+        gameOver();
+      }
+    }
+
+    function updateStats() {
+      document.getElementById("score").textContent = score;
+      document.getElementById("lives").textContent = lives;
+    }
+
+    function gameOver() {
+      document.getElementById("result").textContent = `💀 Game Over! Total Skor: ${score}`;
+      document.getElementById("result").style.color = "black";
+      document.getElementById("restart").style.display = "inline-block";
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
